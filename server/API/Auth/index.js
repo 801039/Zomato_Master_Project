@@ -17,24 +17,24 @@ Mwthod  Post
 */
 Router.post("/signup", async(req,res)=>{
     try{
-        const {email, password, fullname, phoneNumber} = req.body.creditials;
+        const {email, password, fullname, phoneNumber} = req.body.credentials;
 
-        //Check whether email exists
+        //Check whether email and phone number exists
         const checkUserByEmail = await UserModel.findOne({email});
-        const checkUserByPhone = await UserModel.findOne({phoneNumer});
+        const checkUserByPhone = await UserModel.findOne({phoneNumber});
 
         if(checkUserByEmail || checkUserByPhone){
             return res.json({error:"User already exists!!!"}); 
         }
 
-        //Hash the password using bcryptjs
+        //Hash the password using bcryptjs => genSalt(8) = encrypt password 8*
         const bcryptSalt = await bcrypt.genSalt(8);
 
         const hashedPassword = await bcrypt.hash(password, bcryptSalt);
 
         //Save to DB
         await UserModel.create({
-            ...req.body.creditials, 
+            ...req.body.credentials, 
             password: hashedPassword,
         });
 
@@ -48,8 +48,5 @@ Router.post("/signup", async(req,res)=>{
         return res.status(500).json({error: error.message});
     }
 });
-
-
-
-
+    
 export default Router;
